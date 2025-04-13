@@ -32,8 +32,8 @@ public class UserService {
     @Transactional
     public URI createUserProfile(UserDTO userDTO) {
         User user = userMapper.userDTOToUser(userDTO);
-        user = userRepository.save(user);
-        return uriBuilder.path(baseUrl + "/{id}").buildAndExpand(user.getId()).toUri();
+        User savedUser = userRepository.save(user);
+        return uriBuilder.path(baseUrl + "/{id}").buildAndExpand(savedUser.getId()).toUri();
 
     }
 
