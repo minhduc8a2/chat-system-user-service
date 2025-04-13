@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "users", indexes = @Index(columnList = "email", unique = true))
+@Table(name = "users", indexes = @Index(columnList = "email, authId", unique = true))
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
