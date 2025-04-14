@@ -1,6 +1,10 @@
 package com.ducle.user_service.model.entity;
 
-import jakarta.annotation.Generated;
+import java.time.Instant;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -22,8 +26,12 @@ import lombok.Setter;
 public class User {
 
     public User(String email, Long authId) {
-        this.email = email;
-        this.authId = authId;
+        this(null, email, authId, null, null);
+    }
+
+    public User(Long id, String email, Long authId) {
+        this(id, email, authId, null, null);
+
     }
 
     @Id
@@ -35,5 +43,13 @@ public class User {
 
     @Column(nullable = false, unique = true)
     private Long authId;
+
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
+    private Instant createdAt;
+
+    @UpdateTimestamp
+    @Column(nullable = false)
+    private Instant updatedAt;
 
 }

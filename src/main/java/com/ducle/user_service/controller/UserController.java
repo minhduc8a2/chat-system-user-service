@@ -9,12 +9,18 @@ import com.ducle.user_service.model.dto.UserDTO;
 import com.ducle.user_service.service.UserService;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("${api.users.url}")
@@ -25,7 +31,7 @@ public class UserController {
 
     @PostMapping("/email_exists")
     public ResponseEntity<Boolean> checkEmailExists(@Valid @RequestBody EmailCheckingRequest request) {
-        return ResponseEntity.ok(false);
+        return ResponseEntity.ok(userService.checkEmailExists(request));
     }
 
     @PostMapping
@@ -35,8 +41,17 @@ public class UserController {
     }
 
     @GetMapping("/{authId}")
-    public ResponseEntity<UserDTO> getUserProfile(@PathVariable Long authId) {
+    public ResponseEntity<UserDTO> getUserProfile(@Min(1) @PathVariable Long authId) {
         return ResponseEntity.ok(userService.getUserProfile(authId));
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<UserDTO>> getAllUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir) {
+        return ResponseEntity.ok(userService.getAllUsers(page, size, sortBy, sortDir));
     }
 
 }
