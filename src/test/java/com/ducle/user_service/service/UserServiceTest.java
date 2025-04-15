@@ -18,6 +18,7 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.ducle.user_service.mapper.UserMapper;
+import com.ducle.user_service.model.dto.EmailCheckingRequest;
 import com.ducle.user_service.model.dto.UserDTO;
 import com.ducle.user_service.model.entity.User;
 import com.ducle.user_service.repository.UserRepository;
@@ -52,7 +53,7 @@ class UserServiceTest {
     @Test
     void testCheckEmailExists() {
         when(userRepository.existsByEmail(USER_EMAIL)).thenReturn(true);
-        boolean result = userService.checkEmailExists(USER_EMAIL);
+        boolean result = userService.checkEmailExists(new EmailCheckingRequest(USER_EMAIL));
         assertTrue(result, "Email should exist in the database");
     }
 
