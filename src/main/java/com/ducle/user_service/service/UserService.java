@@ -13,12 +13,14 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.ducle.user_service.exception.EntityNotExistsException;
 import com.ducle.user_service.mapper.UserMapper;
+import com.ducle.user_service.model.dto.ClientUserDTO;
 import com.ducle.user_service.model.dto.EmailCheckingRequest;
 import com.ducle.user_service.model.dto.UserDTO;
 import com.ducle.user_service.model.entity.User;
 import com.ducle.user_service.model.enums.UserSortField;
 import com.ducle.user_service.repository.UserRepository;
 
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -44,10 +46,10 @@ public class UserService {
 
     }
 
-    public UserDTO getUserProfile(Long authId) {
+    public ClientUserDTO getUserProfile(Long authId) {
         User user = userRepository.findByAuthId(authId)
                 .orElseThrow(() -> new EntityNotExistsException("User not found"));
-        return userMapper.userToUserDTO(user);
+        return userMapper.userToClientUserDTO(user);
     }
 
     public Page<UserDTO> getAllUsers(int page, int size, String sortBy, String sortDir) {
@@ -61,5 +63,14 @@ public class UserService {
                 : Sort.by(sortField.name()).ascending();
         Pageable pageable = PageRequest.of(page, size, sort);
         return userRepository.findAll(pageable).map(userMapper::userToUserDTO);
+    }
+
+    public ClientUserDTO updateUserProfile(Long authId, ClientUserDTO clientUserDTO) {
+        User user = userRepository.findByAuthId(authId).orElseThrow(
+                () -> new EntityNotExistsException("User not found"));
+
+        user.setEmail(clientUserDTO.email());
+        User updatedUser = userRepository.save(user);
+        return userMapper.userToClientUserDTO(updatedUser);
     }
 }

@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.ducle.user_service.model.dto.ClientUserDTO;
 import com.ducle.user_service.model.dto.EmailCheckingRequest;
 import com.ducle.user_service.model.dto.UserDTO;
 import com.ducle.user_service.service.UserService;
@@ -12,13 +13,12 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -41,8 +41,14 @@ public class UserController {
     }
 
     @GetMapping("/{authId}")
-    public ResponseEntity<UserDTO> getUserProfile(@Min(1) @PathVariable Long authId) {
+    public ResponseEntity<ClientUserDTO> getUserProfile(@Min(1) @PathVariable Long authId) {
         return ResponseEntity.ok(userService.getUserProfile(authId));
+    }
+
+    @PatchMapping("/{authId}")
+    public ResponseEntity<ClientUserDTO> updateUserProfile(@Min(1) @PathVariable Long authId,
+            @Valid @RequestBody ClientUserDTO clientUserDTO) {
+        return ResponseEntity.ok(userService.updateUserProfile(authId, clientUserDTO));
     }
 
     @GetMapping

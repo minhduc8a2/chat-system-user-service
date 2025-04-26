@@ -18,6 +18,7 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.ducle.user_service.mapper.UserMapper;
+import com.ducle.user_service.model.dto.ClientUserDTO;
 import com.ducle.user_service.model.dto.EmailCheckingRequest;
 import com.ducle.user_service.model.dto.UserDTO;
 import com.ducle.user_service.model.entity.User;
@@ -79,7 +80,7 @@ class UserServiceTest {
         UserDTO userDTO = new UserDTO(USER_EMAIL, authId);
         when(userRepository.findByAuthId(authId)).thenReturn(java.util.Optional.of(user));
         when(userMapper.userToUserDTO(user)).thenReturn(userDTO);
-        UserDTO result = userService.getUserProfile(authId);
+        ClientUserDTO result = userService.getUserProfile(authId);
         assertEquals(USER_EMAIL, result.email(), "User email should match the expected email");
     }
 
