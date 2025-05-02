@@ -3,6 +3,9 @@ package com.ducle.user_service.service;
 import java.net.URI;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,7 +23,6 @@ import com.ducle.user_service.model.entity.User;
 import com.ducle.user_service.model.enums.UserSortField;
 import com.ducle.user_service.repository.UserRepository;
 
-import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -34,11 +36,16 @@ public class UserService {
     private final UserMapper userMapper;
     private final UriComponentsBuilder uriBuilder;
 
+    @Cacheable(value = "email_exists", key = "#request.email")
     public boolean checkEmailExists(EmailCheckingRequest request) {
         return userRepository.existsByEmail(request.email());
     }
 
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "email_exists", key = "#userDTO.email"),
+            @CacheEvict(value = "profile", key = "#userDTO.authId")
+    })
     public URI createUserProfile(UserDTO userDTO) {
         User user = userMapper.userDTOToUser(userDTO);
         User savedUser = userRepository.save(user);
@@ -46,6 +53,7 @@ public class UserService {
 
     }
 
+    @Cacheable(value = "profile", key = "#authId")
     public ClientUserDTO getUserProfile(Long authId) {
         User user = userRepository.findByAuthId(authId)
                 .orElseThrow(() -> new EntityNotExistsException("User not found"));
@@ -65,6 +73,10 @@ public class UserService {
         return userRepository.findAll(pageable).map(userMapper::userToUserDTO);
     }
 
+    @Caching(evict = {
+            @CacheEvict(value = "profile", key = "#authId"),
+            @CacheEvict(value = "email_exists", key = "#clientUserDTO.email")
+    })
     public ClientUserDTO updateUserProfile(Long authId, ClientUserDTO clientUserDTO) {
         User user = userRepository.findByAuthId(authId).orElseThrow(
                 () -> new EntityNotExistsException("User not found"));
